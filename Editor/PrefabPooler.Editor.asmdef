@@ -1,0 +1,17 @@
+{
+    "name": "PrefabPooler.Editor",
+    "references": [
+        "GUID:dc704224b6a58b74eafea42413c47b63"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
