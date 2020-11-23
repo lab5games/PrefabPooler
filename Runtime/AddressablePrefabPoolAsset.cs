@@ -215,13 +215,14 @@ namespace Lab5Games
             {
                 if (go != null) GameObject.Destroy(go);
             }
-            
+
+            Addressables.ReleaseInstance(_prefab);
+            Addressables.Release(prefabReference);
+
             _prefab = null;
 
             _avaliables.Clear();
             _spawneds.Clear();
-
-            Addressables.Release(prefabReference);
         }
     }
 }
