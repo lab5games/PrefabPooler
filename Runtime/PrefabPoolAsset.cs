@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Lab5Games
 {
     [CreateAssetMenu(fileName ="PrefabPool Asset", menuName ="Lab5Games/PrefabPool")]
-    public class PrefabPoolAsset : ScriptableObject
+    public class PrefabPoolAsset : ScriptableObject, IPrefabPoolAsset
     {
         public PrefabPool[] pools;
 
@@ -73,9 +73,11 @@ namespace Lab5Games
             {
                 p.CreatePool(parentTransform);
             }
+
+            PrefabPooler.Pools.Add(name, this);
         }
 
-        public void Relase()
+        public void Release()
         {
             foreach(var p in pools)
             {
@@ -84,6 +86,8 @@ namespace Lab5Games
 
             _parentTransform = null;
             _poolNameDict.Clear();
+
+            PrefabPooler.Pools.Remove(name);
         }
     }
 
