@@ -16,6 +16,7 @@ namespace Lab5Games
             foreach(var pool in pools)
             {
                 pool.CreatePool(parent);
+                _poolDict.Add(pool.Name, pool);
             }
         }
 
