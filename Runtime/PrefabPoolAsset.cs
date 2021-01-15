@@ -30,6 +30,11 @@ namespace Lab5Games
             _poolDict.Clear();
         }
 
+        public T Spawn<T>(T component) where T : Component
+        {
+            return Spawn(component.gameObject).GetComponent<T>();
+        }
+
         public GameObject Spawn(GameObject prefab)
         {
             return Spawn(prefab.name);
