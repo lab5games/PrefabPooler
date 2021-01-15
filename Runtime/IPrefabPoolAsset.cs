@@ -2,9 +2,9 @@
 
 namespace Lab5Games
 {
-    public interface IPrefabPoolAsset
+    public interface IPrefabPoolAsset 
     {
-        void Init(Transform parentTransform);
+        void Init();
         void Release();
 
         GameObject Spawn(string prefabName);

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
 
 namespace Lab5Games
@@ -9,9 +8,27 @@ namespace Lab5Games
     {
         public PrefabPool[] pools;
 
-        [System.NonSerialized] Transform _parentTransform;
-        [System.NonSerialized] Dictionary<string, PrefabPool> _poolNameDict = new Dictionary<string, PrefabPool>();
+        [System.NonSerialized] public Transform parent;
+        [System.NonSerialized] private Dictionary<string, PrefabPool> _poolDict = new Dictionary<string, PrefabPool>();
 
+        public void Init()
+        {
+            foreach(var pool in pools)
+            {
+                pool.CreatePool(parent);
+            }
+        }
+
+        public void Release()
+        {
+            foreach(var pool in pools)
+            {
+                pool.DestroyPool();
+            }
+
+            parent = null;
+            _poolDict.Clear();
+        }
 
         public GameObject Spawn(GameObject prefab)
         {
@@ -20,74 +37,36 @@ namespace Lab5Games
 
         public GameObject Spawn(string prefabName)
         {
-            PrefabPool pool = null;
-            if (_poolNameDict.TryGetValue(prefabName, out pool))
+            if(_poolDict.TryGetValue(prefabName, out PrefabPool pool))
             {
                 return pool.Spawn();
             }
             else
             {
-                Debug.LogWarning($"Spawn object failed, not found the PrefabPool({prefabName}).");
-                return null;
-            }
-        }
-
-        public void Recycle(GameObject gameObject)
-        {
-            if (gameObject == null)
-                throw new ArgumentNullException(nameof(gameObject));
-
-            PrefabPool pool = null;
-            if(_poolNameDict.TryGetValue(gameObject.name, out pool))
-            {
-                pool.Recycle(gameObject, _parentTransform);
-            }
-            else
-            {
-                Debug.LogWarning($"Recycle object failed, not found the PrefabPool({gameObject.name}).");
-                GameObject.Destroy(gameObject);
+                throw new System.NullReferenceException($"Spawn GameObject failed, not found the PrefabPool({prefabName}).");
             }
         }
 
         public void Recycle(Transform transform)
         {
-            if (transform == null)
-                throw new ArgumentNullException(nameof(transform));
-
             Recycle(transform.gameObject);
         }
 
         public void Recycle<T>(T component) where T : Component
         {
-            if (component == null)
-                throw new ArgumentNullException(nameof(component));
-
             Recycle(component.gameObject);
         }
 
-        public void Init(Transform parentTransform)
+        public void Recycle(GameObject gameObject)
         {
-            _parentTransform = parentTransform;
-
-            foreach(var p in pools)
+            if(_poolDict.TryGetValue(gameObject.name, out PrefabPool pool))
             {
-                p.CreatePool(parentTransform);
+                pool.Recycle(gameObject, parent);
             }
-
-            PrefabPooler.Pools.Add(name, this);
-        }
-
-        public void Release()
-        {
-            foreach(var p in pools)
+            else
             {
-                p.DestoryPool();
+                GameObject.Destroy(gameObject);
             }
-
-            _parentTransform = null;
-            _poolNameDict.Clear();
-
-            PrefabPooler.Pools.Remove(name);
         }
     }
 
@@ -97,10 +76,10 @@ namespace Lab5Games
         public GameObject prefab;
         public int preloadCount;
 
-        [System.NonSerialized] Stack<GameObject> _avaliables = new Stack<GameObject>();
-        [System.NonSerialized] List<GameObject> _spawneds = new List<GameObject>();
+        [System.NonSerialized] private Stack<GameObject> _avaliables = new Stack<GameObject>();
+        [System.NonSerialized] private List<GameObject> _spawneds = new List<GameObject>();
 
-        public string PrefabName { get { return prefab.name; } }
+        public string Name { get { return prefab.name; } }
 
         public GameObject Spawn()
         {
@@ -116,7 +95,7 @@ namespace Lab5Games
                 go.name = prefab.name;
                 go.SetActive(false);
                 go.transform.localPosition = Vector3.zero;
-                go.transform.localEulerAngles = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
             }
 
             go.SetActive(true);
@@ -124,14 +103,16 @@ namespace Lab5Games
             return go;
         }
 
-        public void Recycle(GameObject gameObject, Transform parentTransform)
+        public void Recycle(GameObject gameObject, Transform parent)
         {
-            if(_spawneds.Remove(gameObject))
+            if(_spawneds.Contains(gameObject))
             {
                 gameObject.SetActive(false);
-                if (parentTransform != null) gameObject.transform.SetParent(parentTransform);
+
+                if (parent) gameObject.transform.SetParent(parent);
+
                 gameObject.transform.localPosition = Vector3.zero;
-                gameObject.transform.localEulerAngles = Vector3.zero;
+                gameObject.transform.localRotation = Quaternion.identity;
 
                 _avaliables.Push(gameObject);
             }
@@ -141,35 +122,38 @@ namespace Lab5Games
             }
         }
 
-        internal void CreatePool(Transform parentTransform)
+        internal void CreatePool(Transform parent)
         {
             if (prefab == null)
-                throw new NullReferenceException("Prefab is null.");
+                throw new System.NullReferenceException("Prefab is null.");
 
             for(int i=0; i<preloadCount; i++)
             {
                 GameObject newGo = GameObject.Instantiate(prefab);
                 newGo.name = prefab.name;
                 newGo.SetActive(false);
-                if(parentTransform != null) newGo.transform.SetParent(parentTransform);
+
+                if (parent) newGo.transform.SetParent(parent);
+
                 newGo.transform.localPosition = Vector3.zero;
-                newGo.transform.localEulerAngles = Vector3.zero;
+                newGo.transform.localRotation = Quaternion.identity;
 
                 _avaliables.Push(newGo);
             }
         }
 
-        internal void DestoryPool()
+        internal void DestroyPool()
         {
             foreach(var go in _avaliables)
             {
-                if (go != null) GameObject.Destroy(go);
+                if (go) GameObject.Destroy(go);
             }
 
             foreach(var go in _spawneds)
             {
-                if (go != null) GameObject.Destroy(go);
+                if (go) GameObject.Destroy(go);
             }
+
 
             _avaliables.Clear();
             _spawneds.Clear();
