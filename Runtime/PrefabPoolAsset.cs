@@ -105,6 +105,7 @@ namespace Lab5Games
             }
 
             go.SetActive(true);
+            _spawneds.Add(go);
 
             return go;
         }
