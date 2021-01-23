@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Lab5Games
+namespace Lab5Games.Pooling
 {
-    [CreateAssetMenu(fileName ="PrefabPool Asset", menuName ="Lab5Games/PrefabPool")]
+    [CreateAssetMenu(fileName ="PrefabPool Asset", menuName ="Lab5Games/Pooling/Prefab Pool")]
     public class PrefabPoolAsset : ScriptableObject, IPrefabPoolAsset
     {
         public PrefabPool[] pools;

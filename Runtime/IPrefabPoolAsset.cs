@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Lab5Games
+namespace Lab5Games.Pooling
 {
     public interface IPrefabPoolAsset 
     {
