@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lab5Games.Pooling
 {
-    [CreateAssetMenu(fileName ="PrefabPool Asset", menuName ="Lab5Games/Pooling/Prefab Pool")]
+    [CreateAssetMenu(fileName ="PrefabPool Asset", menuName ="Lab5Games/Pooling/PrefabPool")]
     public class PrefabPoolAsset : ScriptableObject, IPrefabPoolAsset
     {
         public PrefabPool[] pools;
